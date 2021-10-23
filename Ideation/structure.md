@@ -15,7 +15,7 @@
 ### Classes and attributes
  - Algorithms
    - all the algorithms available
-   - algorithms to identify stocks/options/futures to buy/short
+   - algorithms to identify stocks/options(BANKNIFTY)/futures to buy/short based on timeframe
    - methods to enter/exit the trade using algorithm
    - different classes for different algorithms
  - Portfolio

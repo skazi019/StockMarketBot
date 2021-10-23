@@ -1,0 +1,11 @@
+{
+  "postgres": {
+    "stockmarketbot" : {
+      "db_name": "stockmarketbot",
+      "username": "postgres",
+      "password": "postgres@123",
+      "host": "localhost",
+      "port": 5432
+    }
+  }
+}
