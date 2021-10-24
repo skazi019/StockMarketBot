@@ -1,5 +1,5 @@
-from sqlalchemy import Column, String, Integer, Float, TIMESTAMP
-from sqlalchemy.orm import relationship, backref
+from datetime import datetime
+from sqlalchemy import Column, String, Integer, Float, TIMESTAMP, Sequence
 
 from Code.Utilities.database.db_util import DatabaseUtil
 
@@ -7,11 +7,12 @@ driver = DatabaseUtil()
 session, base = driver._get_session_and_base()
 
 
-class Portfolio:
-    __tablename__ = 'portfolio'
+class TradeBook:
+    __tablename__ = 'tradebook'
 
+    id = Column(Sequence, primary_key=True, )
     name = Column(String)
-    date_of_purchase = Column(TIMESTAMP)
+    date_of_purchase = Column(TIMESTAMP, default=datetime.now())
     qty = Column(Integer)
     price = Column(Float)
     invested = Column(Float)
