@@ -5,20 +5,21 @@ from pathlib import Path
 
 class ConfigUtil:
 
-    def __init__(self):
-        self.__config = None
-        self.__base_path = Path(__file__).parent
+    __config = None
+    __base_path = Path(__file__).parent
 
-    def _set_config(self):
+    @classmethod
+    def _set_config(cls):
         try:
-            with open(os.path.join(self.__base_path, 'development.json'), 'rb') as f:
-                self.__config = json.load(f)
+            with open(os.path.join(cls.__base_path, 'development.json'), 'rb') as f:
+                cls.__config = json.load(f)
         except Exception as e:
             print(e)
 
-    def _get_config(self, server='postgres'):
-        if self.__config is not None:
-            return self.__config[server]
+    @classmethod
+    def _get_config(cls, server='postgres'):
+        if cls.__config is not None:
+            return cls.__config[server]
         else:
-            self._set_config()
-            return self.__config[server]
+            cls._set_config()
+            return cls.__config[server]

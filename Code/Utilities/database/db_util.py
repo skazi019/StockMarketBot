@@ -15,8 +15,7 @@ class DatabaseUtil:
 
     def _create_session(self):
         engine_url = 'postgresql://{username}:{password}@{host}:{port}/{db_name}'
-        config = ConfigUtil()
-        db_config = config._get_config('postgres')['stockmarketbot']
+        db_config = ConfigUtil._get_config('postgres')['stockmarketbot']
         self.__engine = create_engine(engine_url. format(username=db_config['username'],
                                                          password=db_config['password'],
                                                          host=db_config['host'],

@@ -7,5 +7,12 @@
       "host": "localhost",
       "port": 5432
     }
+  },
+  "stockmarket": {
+    "alphavanage": {
+      "api-key": "7T0CDQB48W204PF1",
+      "url": "https://alpha-vantage.p.rapidapi.com/query",
+      "host": "alpha-vantage.p.rapidapi.com"
+    }
   }
 }
