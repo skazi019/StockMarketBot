@@ -9,10 +9,16 @@
     }
   },
   "stockmarket": {
-    "alphavanage": {
+    "alphavantage": {
       "api-key": "7T0CDQB48W204PF1",
-      "url": "https://alpha-vantage.p.rapidapi.com/query",
-      "host": "alpha-vantage.p.rapidapi.com"
+      "url": "https://www.alphavantage.co/query?"
     }
+  },
+  "angelbroking": {
+    "apikey": "Hvg1f7GQ",
+    "secretkey": "d669bce4-930b-4ac7-8f05-3b36eeedad12"
+  },
+  "unibit": {
+    "apikey": "fssh6gLjmBtymLpEQt8cgn39R06AtO4Y"
   }
 }

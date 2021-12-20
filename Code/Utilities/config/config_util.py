@@ -17,7 +17,7 @@ class ConfigUtil:
             print(e)
 
     @classmethod
-    def _get_config(cls, server='postgres'):
+    def get_config(cls, server='postgres'):
         if cls.__config is not None:
             return cls.__config[server]
         else:
