@@ -11,6 +11,7 @@ from Code.Core.fetch_data import FetchData
 from Code.Core.technical_indicators import TechnicalIndicators
 from Code.Core.visualise_data import VisualiseData
 from Code.Algorithms.three_ma_crossover import ThreeMaCrossover
+from Code.Core.calc_pl import CalculateProfitLoss
 
 
 class Scanner:
@@ -95,15 +96,16 @@ try:
         if 'NIFTY' in symbol.split(' '):
             continue
         try:
+            print("="*100)
             print(f"Scanning {symbol}")
             symbol_data = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker=symbol, period=period, interval=interval))
             symbol_data.drop(['Open', 'High', 'Low', 'Adj Close'], axis=1, inplace=True)
+            symbol_data.reset_index(drop=False, inplace=True)
             ticker_df = asyncio.run(TechnicalIndicators.calculate_all_emas(symbol_data))
-            ticker_df = asyncio.run(ThreeMaCrossover.identify_crossovers(ticker_df=ticker_df))
-            print(ticker_df)
+            ticker_df = asyncio.run(ThreeMaCrossover.identify_crossovers_close_9ema(ticker_df=ticker_df))
+            ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
 
-
-            break
+            # break
         except Exception as e:
             print(f"Error in processing or data not available for {symbol}")
 
