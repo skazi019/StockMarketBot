@@ -9,6 +9,9 @@ class CalculateProfitLoss:
     @staticmethod
     def calculate_pl(ticker_df):
         ticker_df['BACKTEST_PL'] = 0
+        ticker_df['BACKTEST_PL'] = ticker_df.apply(
+            lambda x: -x['Close'] if x['SIGNAL'] == 'BUY' else x['Close'] if x['SIGNAL'] == 'SELL' else 0
+            , axis=1)
         ticker_df['BACKTEST_PL'] = ticker_df['Close'].diff(periods=1).mask(ticker_df['SIGNAL'] == 'BUY')
         ticker_df['BACKTEST_PL'].fillna(0, inplace=True)
         print(f"\nTotal Profit: {ticker_df['BACKTEST_PL'].sum()}")
