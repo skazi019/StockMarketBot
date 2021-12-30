@@ -13,20 +13,25 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
     """
     This handler will be called when user sends `/start` or `/help` command
     """
-    await message.reply("Hi!\nI'm EchoBot!\nPowered by aiogram.")
+    bot_message = "Hi, I'm StockBot!\nBelow are the services available for you!"
+    await message.reply(bot_message)
 
 
 @dp.message_handler()
 async def echo(message: types.Message):
     # old style:
     # await bot.send_message(message.chat.id, message.text)
-
-    await message.answer(message.text)
+    if message.text.split()[0].split()[0] != '/':
+        print(message.text.split()[0].split()[0])
+        await message.answer(f"{message.text} is not a valid command")
+    else:
+        await message.answer(f"I'm sorry i did not understand the command {message.text}")
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
