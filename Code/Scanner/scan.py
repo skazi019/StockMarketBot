@@ -18,17 +18,30 @@ from Code.Algorithms.all_time_high import AllTimeHigh
 class Scanner:
 
     def __init__(self):
-        pass
+        all_sectors = self.get_all_sectors()
 
-    @staticmethod
-    def get_all_tickers():
+    def get_all_sectors(self):
+        """
+        Reads all the sectors available in the tickers folder
+        :return: {int: tuple(str, str)}
+        """
+
         counter = 1
         ticker_selection = {}
-        for files in os.listdir('tickers'):
-            files = files.split('.')[0].replace('_', ' ')
-            ticker_selection[counter] = files
-            counter += 1
+        for p, d, f in os.listdir('tickers'):
+            for files in f:
+                files = files.split('.')[0].replace('_', ' ')
+                ticker_selection[counter] = (os.path.join(p, files), files)
+                counter += 1
         return ticker_selection
+
+    async def get_all_time_high_st(self):
+        loop = asyncio.get_running_loop()
+        tasks = []
+        for key, value in self.all_sectors.items():
+            for ticker in pd.read_csv(value[0])['Symbol'].to_list():
+                tasks.append(loop.run_in_executor(None, AllTimeHigh.close_to_ath_short_term(ticker), args))
+
 
 
 if __name__ == '__main__':
@@ -40,7 +53,7 @@ if __name__ == '__main__':
         # selection = int(input("\nWhich sector would you like to scan?\n"))
         selection = 3
         print(f'{available_tickers[selection]} selected\n')
-        sector_selected = 'tickers/' + available_tickers[selection].replace(' ', '_') + '.csv'
+        sector_selected = os.path.join('tickers', available_tickers[selection].replace(' ', '_') + '.csv')
         sector_df = pd.read_csv(sector_selected)
 
         timeintervals = {
