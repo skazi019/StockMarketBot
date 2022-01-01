@@ -1,7 +1,9 @@
 
+import asyncio
+
 import Code.TelegramBot.telegram_util as util
 from telegram.ext import CallbackContext, Filters, CallbackQueryHandler
-from telegram import Update, InlineKeyboardButton, ReplyKeyboardMarkup, utils, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, ReplyKeyboardMarkup, utils, InlineKeyboardMarkup, ChatAction
 
 from Code.TelegramBot.telegram_services import TelegramServices
 
@@ -12,6 +14,7 @@ class TelegramCommands:
 
     @staticmethod
     def start(update: Update, context: CallbackContext):
+        context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
         context.bot.send_message(chat_id=update.effective_chat.id, text="Hi, I'm StockBot!")
 
     @staticmethod
@@ -26,14 +29,37 @@ class TelegramCommands:
 
     @staticmethod
     def menuclick(update: Update, context: CallbackContext):
+        context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
         query = update.callback_query
         query.answer()
         service = query.data
+        telegram_services = TelegramServices()
+
         if service == 'ath_short':
-            text = TelegramServices.ath_short()
+            text = "Finding stocks close to All Time High in **Short Term**\n"
+            text += "interval: 1 hour\tperiod: 6 months\n this might take some time"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+            # tickers = asyncio.run(telegram_services.ath_short())
+            tickers = []
+            if len(tickers) <= 0:
+                text = "No ticker close to All Time High for Short Term"
+            else:
+                text = "Below are the tickers close to All Time High in Short Term:\n"
+                for t in tickers:
+                    text += str(t)+"\n"
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
         elif service == 'ath_long':
-            text = TelegramServices.ath_long()
+            text = "Finding stocks close to All Time High in **Long Term**\n"
+            text += "interval: 1 month \tperiod: MAX\n this might take some time"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+            tickers = asyncio.run(telegram_services.ath_long())
+            # tickers = []
+            if len(tickers) <= 0:
+                text = "No ticker close to All Time High for Long Term"
+            else:
+                text = "Below are the tickers close to All Time High in Long Term:\n"
+                for t in tickers:
+                    text += str(t) + "\n"
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
         else:
             text = "I could not find the selected service"
