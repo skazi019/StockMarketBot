@@ -39,7 +39,7 @@ class TelegramCommands:
         try:
             if service == 'ath_short':
                 text = "Finding stocks close to All Time High in Short Term\n\n"
-                text += "interval: 1 hour\tperiod: 6 months\n\nThis might take some time"
+                text += "interval: 1 hour\nperiod: 6 months\n\nThis might take some time"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
@@ -52,13 +52,13 @@ class TelegramCommands:
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
             elif service == 'ath_long':
-                text = "Finding stocks close to All Time High in **Long Term**\n"
-                text += "interval: 1 month \tperiod: MAX\n this might take some time"
+                text = "Finding stocks close to All Time High in Long Term\n\n"
+                text += "interval: 1 month\nperiod: MAX\n this might take some time"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
                     context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
-                    tickers = asyncio.run(telegram_services.ath_long(update, context))
+                    asyncio.run(telegram_services.ath_long(update, context))
                     text = f"Scanning Complete"
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
