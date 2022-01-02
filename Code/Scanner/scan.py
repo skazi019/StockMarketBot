@@ -8,7 +8,7 @@ import traceback
 import pandas as pd
 
 from telegram.ext import CallbackContext
-from telegram import Update
+from telegram import Update, ChatAction
 
 from Code.Core.fetch_data import FetchData
 from Code.Core.technical_indicators import TechnicalIndicators
@@ -21,7 +21,8 @@ from Code.Algorithms.all_time_high import AllTimeHigh
 class Scanner:
 
     def __init__(self):
-        self.sector_path = "/Users/kaushal/Kaushal/Projects/Personal/StockMarketBot/Code/Scanner/tickers"
+        self.sector_path_mac = "/Users/kaushal/Kaushal/Projects/Personal/StockMarketBot/Code/Scanner/tickers"
+        self.sector_path_win = "C:\\Kaushal\\PersonalProjects\\StockMarketBot\\Code\\Scanner\\tickers"
 
     def get_all_tickers(self):
         """
@@ -31,54 +32,68 @@ class Scanner:
 
         counter = 1
         tickers = []
-        for p, d, f in os.walk(''):
+        for p, d, f in os.walk(self.sector_path_win):
             for files in f:
                 if files == '.DS_Store':
                     continue
                 tickers += pd.read_csv(os.path.join(p, files))['Symbol'].to_list()
         return tickers
 
-    async def get_all_time_high_st(self,update: Update, context: CallbackContext, all_tickers):
+    async def get_all_time_high_st(self,update: Update, context: CallbackContext):
         try:
-            # loop = asyncio.get_running_loop()
-            # tasks = []
-            ath_tickers = []
-            for sectors in os.listdir(self.sector_path):
-                text = f"Scanning sector: {sectors.split('.')[0]}"
-                context.bot.send_message(chat_id=update.effective_chat.id, text=text)
-                text = f"Below are the stock identified in the sectors: {sectors.split('.')[0]}"
-                for tickers in pd.read_csv(sectors)['Symbol'].to_list():
-                    ath_tickers.append(AllTimeHigh.close_to_ath_short_term(symbol=ticker))
-            # for ticker in all_tickers:
-            #     # task_queue.put(asyncio.create_task(AllTimeHigh.close_to_ath_short_term(symbol=ticker)))
-            #     tasks.append(loop.create_task(AllTimeHigh.close_to_ath_short_term(symbol=ticker)))
-            # response, pending = await asyncio.wait(tasks)
-            # ath_tickers = []
-            # [ath_tickers.append(task.result()) for task in response]
-            # ath_tickers = list(filter(None, ath_tickers))
-            # print(ath_tickers)
-            return ath_tickers
+            for p,d,f in os.walk(self.sector_path_win):
+                for sector in f:
+                    ath_tickers = []
+                    if '.csv' not in sector:
+                        continue
+                    sector_name = sector.split('.')[0].replace('_', ' ')
+                    text = f"Scanning sector: {sector_name}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                    for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                        ath_tickers.append(await AllTimeHigh.close_to_ath_short_term(symbol=ticker))
+                    ath_tickers = list(filter(None, ath_tickers))
+
+                    if len(ath_tickers) <= 0:
+                        text = f"No stocks near All Time High in sector: {sector_name}"
+                    else:
+                        text = f"{len(ath_tickers)} stocks identified close to " \
+                               f"All Time High in the sector: {sector_name}\n\n"
+                        for ticker in ath_tickers:
+                            text += str(ticker)+"\n"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
         except Exception as e:
             print(f"Error occured: {e}")
             text = f"Sorry i could not process the request\nError: {e}"
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
-    async def get_all_time_high_lt(self, all_tickers):
-        loop = asyncio.get_running_loop()
-        tasks = []
-        # task_queue = asyncio.Queue()
+    async def get_all_time_high_lt(self,update: Update, context: CallbackContext):
         try:
-            for ticker in all_tickers:
-                # task_queue.put(asyncio.create_task(AllTimeHigh.close_to_ath_short_term(symbol=ticker)))
-                tasks.append(loop.create_task(AllTimeHigh.close_to_ath_long_term(symbol=ticker)))
-            response, pending = await asyncio.wait(tasks)
-            ath_tickers = []
-            [ath_tickers.append(task.result()) for task in response]
-            ath_tickers = list(filter(None, ath_tickers))
-            print(ath_tickers)
-            return ath_tickers
+            for p,d,f in os.walk(self.sector_path_win):
+                for sector in f:
+                    ath_tickers = []
+                    if '.csv' not in sector:
+                        continue
+                    sector_name = sector.split('.')[0].replace('_', ' ')
+                    text = f"Scanning sector: {sector_name}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                    for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                        ath_tickers.append(await AllTimeHigh.close_to_ath_long_term(symbol=ticker))
+                    ath_tickers = list(filter(None, ath_tickers))
+
+                    if len(ath_tickers) <= 0:
+                        text = f"No stocks near All Time High in sector: {sector_name}"
+                    else:
+                        text = f"{len(ath_tickers)} stocks identified close to " \
+                               f"All Time High in the sector: {sector_name}\n\n"
+                        for ticker in ath_tickers:
+                            text += str(ticker)+"\n"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
         except Exception as e:
             print(f"Error occured: {e}")
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
 

@@ -7,6 +7,7 @@ from telegram import Update, InlineKeyboardButton, ReplyKeyboardMarkup, utils, I
 
 from Code.TelegramBot.telegram_services import TelegramServices
 
+
 class TelegramCommands:
 
     def __init__(self):
@@ -42,18 +43,13 @@ class TelegramCommands:
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
-                    tickers = asyncio.run(telegram_services.ath_short(update, context))
+                    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+                    asyncio.run(telegram_services.ath_short(update, context))
+                    text = f"Scanning Complete"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
                     text = f"Sorry i could not process the request\nError: {e}"
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
-
-                # if len(tickers) <= 0:
-                #     text = "No ticker close to All Time High for Short Term"
-                # else:
-                #     text = "Below are the tickers close to All Time High in Short Term:\n\n"
-                #     for t in tickers:
-                #         text += str(t)+"\n"
-                # context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
             elif service == 'ath_long':
                 text = "Finding stocks close to All Time High in **Long Term**\n"
@@ -61,18 +57,14 @@ class TelegramCommands:
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
-                    tickers = asyncio.run(telegram_services.ath_long())
+                    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+                    tickers = asyncio.run(telegram_services.ath_long(update, context))
+                    text = f"Scanning Complete"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
                     text = f"Sorry i could not process the request\nError: {e}"
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
-                # if len(tickers) <= 0:
-                #     text = "No ticker close to All Time High for Long Term"
-                # else:
-                #     text = "Below are the tickers close to All Time High in Long Term:\n"
-                #     for t in tickers:
-                #         text += str(t) + "\n"
-                # context.bot.send_message(chat_id=update.effective_chat.id, text=text)
             else:
                 text = "I could not find the selected service"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
