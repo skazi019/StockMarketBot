@@ -1,6 +1,6 @@
 
 import os
-os.chdir('../../Code')
+os.chdir('../../')
 
 import logging
 
