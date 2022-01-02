@@ -1,10 +1,13 @@
 
+import os
 import logging
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
 from Code.Utilities.config.config_util import ConfigUtil
 from Code.TelegramBot.telegram_commands import TelegramCommands
+
+os.chdir('../..')
 
 logging.basicConfig(format='%(asctime)s | %(name)s | %(levelname)s | %(message)s', level=logging.INFO)
 
