@@ -21,27 +21,11 @@ from Code.Algorithms.all_time_high import AllTimeHigh
 class Scanner:
 
     def __init__(self):
-        self.sector_path_mac = "/Users/kaushal/Kaushal/Projects/Personal/StockMarketBot/Code/Scanner/tickers"
-        self.sector_path_win = "C:\\Kaushal\\PersonalProjects\\StockMarketBot\\Code\\Scanner\\tickers"
-
-    def get_all_tickers(self):
-        """
-        Reads all the sectors available in the tickers folder
-        :return: {int: tuple(str, str)}
-        """
-
-        counter = 1
-        tickers = []
-        for p, d, f in os.walk(self.sector_path_win):
-            for files in f:
-                if files == '.DS_Store':
-                    continue
-                tickers += pd.read_csv(os.path.join(p, files))['Symbol'].to_list()
-        return tickers
+        self.sector_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tickers')
 
     async def get_all_time_high_st(self,update: Update, context: CallbackContext):
         try:
-            for p,d,f in os.walk(self.sector_path_win):
+            for p,d,f in os.walk(self.sector_path):
                 for sector in f:
                     ath_tickers = []
                     if '.csv' not in sector:
@@ -69,7 +53,7 @@ class Scanner:
 
     async def get_all_time_high_lt(self,update: Update, context: CallbackContext):
         try:
-            for p,d,f in os.walk(self.sector_path_win):
+            for p,d,f in os.walk(self.sector_path):
                 for sector in f:
                     ath_tickers = []
                     if '.csv' not in sector:
