@@ -1,6 +1,6 @@
 
-import os
-os.chdir('../../')
+import sys
+sys.path.append('../../../StockMarketBot')
 
 import logging
 
