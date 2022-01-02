@@ -33,4 +33,4 @@ jobs:
     - name: Running the telegram handler
       working-directory: ./Code/TelegramBot
       run: |
-        python telegram_handler.py &
+        python telegram_handler.py
