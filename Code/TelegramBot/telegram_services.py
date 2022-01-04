@@ -28,3 +28,20 @@ class TelegramServices:
             print(traceback.print_exc())
             text = f"Sorry i could not process the request\nError: {e}"
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+    async def ema_cross_9_21(self, update: Update, context: CallbackContext):
+        try:
+            await self.scanner.get_9_21_ema_cross(update, context)
+        except Exception as e:
+            print(traceback.print_exc())
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+
+    async def ema_cross_21_90(self, update: Update, context: CallbackContext):
+        try:
+            await self.scanner.get_21_90_ema_cross(update, context)
+        except Exception as e:
+            print(traceback.print_exc())
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)

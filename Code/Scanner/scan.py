@@ -22,6 +22,7 @@ class Scanner:
 
     def __init__(self):
         self.sector_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tickers')
+        self.all_sector_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'all_sectors')
 
     async def get_all_time_high_st(self,update: Update, context: CallbackContext):
         try:
@@ -45,7 +46,6 @@ class Scanner:
                         for ticker in ath_tickers:
                             text += str(ticker)+"\n"
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
-
         except Exception as e:
             print(f"Error occured: {e}")
             text = f"Sorry i could not process the request\nError: {e}"
@@ -73,7 +73,78 @@ class Scanner:
                         for ticker in ath_tickers:
                             text += str(ticker)+"\n"
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        except Exception as e:
+            print(f"Error occured: {e}")
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
+    async def get_9_21_ema_cross(self,update: Update, context: CallbackContext):
+        try:
+            for p,d,f in os.walk(self.sector_path):
+                for sector in f:
+                    ath_tickers = []
+                    if '.csv' not in sector:
+                        continue
+                    sector_name = sector.split('.')[0].replace('_', ' ')
+                    text = "="*5 + f" Scanning sector: {sector_name} " + "="*5
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                    for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y')
+                        ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
+                        ticker_df = await EmaCrossover.identify_9_21_crossover(ticker_df=ticker_df)
+                        last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
+                        if 'BUY' in last_5_days and 'SELL' not in last_5_days:
+                            ath_tickers.append(ticker)
+                        else:
+                            continue
+                        # ath_tickers.append(await AllTimeHigh.close_to_ath_long_term(symbol=ticker))
+                    ath_tickers = list(filter(None, ath_tickers))
+
+                    if len(ath_tickers) <= 0:
+                        text = f"No stocks have 21 and 90 EMA Cross in the past " \
+                               f"5 days for sector: {sector_name}"
+                    else:
+                        text = f"{len(ath_tickers)} stocks identified having 21 and 90 EMA Cross in the past " \
+                               f"5 days in the sector: {sector_name}\n\n"
+                        for ticker in ath_tickers:
+                            text += str(ticker)+"\n"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        except Exception as e:
+            print(f"Error occured: {e}")
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+    async def get_21_90_ema_cross(self,update: Update, context: CallbackContext):
+        try:
+            for p,d,f in os.walk(self.all_sector_path):
+                for sector in f:
+                    ath_tickers = []
+                    if '.csv' not in sector:
+                        continue
+                    sector_name = sector.split('.')[0].replace('_', ' ')
+                    text = f"Scanning sector: {sector_name}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                    for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y')
+                        ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
+                        ticker_df = await EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df)
+                        last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
+                        if 'BUY' in last_5_days and 'SELL' not in last_5_days:
+                            ath_tickers.append(ticker)
+                        else:
+                            continue
+                        # ath_tickers.append(await AllTimeHigh.close_to_ath_long_term(symbol=ticker))
+                    ath_tickers = list(filter(None, ath_tickers))
+
+                    if len(ath_tickers) <= 0:
+                        text = f"No stocks have 21 and 90 EMA Cross in the past " \
+                               f"5 days for sector: {sector_name}"
+                    else:
+                        text = f"{len(ath_tickers)} stocks identified having 21 and 90 EMA Cross in the past " \
+                               f"5 days in the sector: {sector_name}\n\n"
+                        for ticker in ath_tickers:
+                            text += str(ticker)+"\n"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
         except Exception as e:
             print(f"Error occured: {e}")
             text = f"Sorry i could not process the request\nError: {e}"
@@ -81,13 +152,13 @@ class Scanner:
 
 
 
-if __name__ == '__main__':
-    try:
-        scanner = Scanner()
-        all_tickers = scanner.get_all_tickers()
-        asyncio.run(scanner.get_all_time_high_st(all_tickers=all_tickers))
-    except Exception as e:
-        print(f"Error ocurred: {e}")
+# if __name__ == '__main__':
+#     try:
+#         scanner = Scanner()
+#         all_tickers = scanner.get_all_tickers()
+#         asyncio.run(scanner.get_all_time_high_st(all_tickers=all_tickers))
+#     except Exception as e:
+#         print(f"Error ocurred: {e}")
     #     available_tickers = Scanner.get_all_tickers()
     #     # for key, value in available_tickers.items():
     #     #     print(key, value)
