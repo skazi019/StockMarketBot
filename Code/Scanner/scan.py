@@ -89,7 +89,7 @@ class Scanner:
                     text = "="*5 + f" Scanning sector: {sector_name} " + "="*5
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                     for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
-                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y')
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1h', period='6mo')
                         ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
                         ticker_df = await EmaCrossover.identify_9_21_crossover(ticker_df=ticker_df)
                         last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
@@ -152,13 +152,14 @@ class Scanner:
 
 
 
-# if __name__ == '__main__':
-#     try:
-#         scanner = Scanner()
-#         all_tickers = scanner.get_all_tickers()
-#         asyncio.run(scanner.get_all_time_high_st(all_tickers=all_tickers))
-#     except Exception as e:
-#         print(f"Error ocurred: {e}")
+if __name__ == '__main__':
+    try:
+        ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker='HAVELLS', interval='1h', period='6mo'))
+        ticker_df = asyncio.run(TechnicalIndicators.calculate_all_emas(ticker_df))
+        ticker_df = asyncio.run(EmaCrossover.identify_9_21_crossover(ticker_df=ticker_df))
+        ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
+    except Exception as e:
+        print(f"Error ocurred: {e}")
     #     available_tickers = Scanner.get_all_tickers()
     #     # for key, value in available_tickers.items():
     #     #     print(key, value)
