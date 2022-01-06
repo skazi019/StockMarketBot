@@ -80,7 +80,7 @@ class Scanner:
 
     async def get_9_21_ema_cross(self,update: Update, context: CallbackContext):
         try:
-            for p,d,f in os.walk(self.sector_path):
+            for p,d,f in os.walk(self.all_sector_path):
                 for sector in f:
                     ath_tickers = []
                     if '.csv' not in sector:
@@ -101,10 +101,10 @@ class Scanner:
                     ath_tickers = list(filter(None, ath_tickers))
 
                     if len(ath_tickers) <= 0:
-                        text = f"No stocks have 21 and 90 EMA Cross in the past " \
+                        text = f"No stocks have 9 and 21 EMA Cross in the past " \
                                f"5 days for sector: {sector_name}"
                     else:
-                        text = f"{len(ath_tickers)} stocks identified having 21 and 90 EMA Cross in the past " \
+                        text = f"{len(ath_tickers)} stocks identified having 9 and 21 EMA Cross in the past " \
                                f"5 days in the sector: {sector_name}\n\n"
                         for ticker in ath_tickers:
                             text += str(ticker)+"\n"
@@ -116,7 +116,7 @@ class Scanner:
 
     async def get_21_90_ema_cross(self,update: Update, context: CallbackContext):
         try:
-            for p,d,f in os.walk(self.all_sector_path):
+            for p,d,f in os.walk(self.sector_path):
                 for sector in f:
                     ath_tickers = []
                     if '.csv' not in sector:
@@ -128,7 +128,7 @@ class Scanner:
                         ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y')
                         ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
                         ticker_df = await EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df)
-                        last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
+                        last_5_days = ticker_df.tail(3)['SIGNAL'].to_list()
                         if 'BUY' in last_5_days and 'SELL' not in last_5_days:
                             ath_tickers.append(ticker)
                         else:
@@ -138,10 +138,10 @@ class Scanner:
 
                     if len(ath_tickers) <= 0:
                         text = f"No stocks have 21 and 90 EMA Cross in the past " \
-                               f"5 days for sector: {sector_name}"
+                               f"3 days for sector: {sector_name}"
                     else:
                         text = f"{len(ath_tickers)} stocks identified having 21 and 90 EMA Cross in the past " \
-                               f"5 days in the sector: {sector_name}\n\n"
+                               f"3 days in the sector: {sector_name}\n\n"
                         for ticker in ath_tickers:
                             text += str(ticker)+"\n"
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)

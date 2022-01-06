@@ -69,7 +69,7 @@ class TelegramCommands:
 
             elif service == '9_21_ema_cross':
                 text = "Finding stocks with 9 and 21 EMA Crossing\n\n"
-                text += "interval: 1 Day\nperiod: 1 Year\n\nThis might take some time"
+                text += "interval: 1 Hour\nperiod: 6 Months\n\nThis might take some time"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
