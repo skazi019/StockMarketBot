@@ -9,7 +9,7 @@ class VisualiseData:
         pass
 
     @staticmethod
-    def plot_close_price(ticker_df, symbol:str):
+    def plot_close_price(ticker_df, symbol: str):
         # ticker_df.set_index(pd.DatetimeIndex(ticker_df['Date'].values), inplace=True)
         plt.figure(figsize=(14,8))
         plt.title(f'{symbol}', fontsize=18)
@@ -19,9 +19,9 @@ class VisualiseData:
         plt.show()
 
     @staticmethod
-    def plot_emas(ticker_df, symbol:str):
+    def plot_emas(ticker_df, symbol: str):
         pass
 
     @staticmethod
-    def plot_signals(ticker_df, symbol:str):
+    def plot_signals(ticker_df, symbol: str):
         pass
