@@ -16,6 +16,7 @@ from Code.Core.visualise_data import VisualiseData
 from Code.Algorithms.ema_crossover import EmaCrossover
 from Code.Core.calc_pl import CalculateProfitLoss
 from Code.Algorithms.all_time_high import AllTimeHigh
+from Code.Algorithms.near_ma import NearMA
 
 
 class Scanner:
@@ -128,8 +129,8 @@ class Scanner:
                         ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y')
                         ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
                         ticker_df = await EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df)
-                        last_3_days = ticker_df.tail(3)['SIGNAL'].to_list()
-                        if 'BUY' in last_3_days and 'SELL' not in last_3_days:
+                        last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
+                        if 'BUY' in last_5_days and 'SELL' not in last_5_days:
                             ath_tickers.append(ticker)
                         else:
                             continue
@@ -154,26 +155,32 @@ class Scanner:
 
 if __name__ == '__main__':
     try:
-        # scanner = Scanner()
-        # for p, d, f in os.walk(scanner.sector_path):
-        #     for sector in f:
-        #         ath_tickers = []
-        #         if '.csv' not in sector:
-        #             continue
-        #         sector_name = sector.split('.')[0].replace('_', ' ')
-        #         text = f"Scanning sector: {sector_name}"
-        #         for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
-        #             print(f"Looking up: {ticker}")
-        #             ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y'))
-        #             ticker_df = asyncio.run(TechnicalIndicators.calculate_all_emas(ticker_df))
-        #             ticker_df = asyncio.run(EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df))
-        #             ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
-        #             print("="*60)
-        ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker='ITC', interval='1d', period='1y'))
-        ticker_df = asyncio.run(TechnicalIndicators.calculate_all_emas(ticker_df))
-        ticker_df = asyncio.run(TechnicalIndicators.calculate_all_vwma(ticker_df=ticker_df))
-        ticker_df = asyncio.run(EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df))
-        ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
+        scanner = Scanner()
+        for p, d, f in os.walk(scanner.sector_path):
+            for sector in f:
+                ath_tickers = []
+                if '.csv' not in sector:
+                    continue
+                sector_name = sector.split('.')[0].replace('_', ' ')
+                text = f"Scanning sector: {sector_name}"
+                for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                    print(f"Looking up: {ticker}")
+                    ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y'))
+                    ticker_df = asyncio.run(TechnicalIndicators.calculate_all_emas(ticker_df))
+                    # ticker_df = asyncio.run(EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df))
+                    near_200_ema, ltp = asyncio.run(NearMA.near_200_ema(ticker_df=ticker_df))
+                    if near_200_ema == True:
+                        print(f"***** {ticker} near 200 EMA LTP: {ltp} *****")
+                        # ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
+                    print("="*60)
+        # ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker='ANGELONE', interval='1d', period='1y'))
+        # ticker_df = asyncio.run(TechnicalIndicators.calculate_all_emas(ticker_df))
+        # # ticker_df = asyncio.run(TechnicalIndicators.calculate_all_vwma(ticker_df=ticker_df))
+        # # ticker_df = asyncio.run(EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df))
+        # near_200_ema = asyncio.run(NearMA.near_200_ema(ticker_df=ticker_df))
+        # if near_200_ema == True:
+        #     print(f"")
+        # ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
     except Exception as e:
         print(f"Error ocurred: {e}")
     #     available_tickers = Scanner.get_all_tickers()

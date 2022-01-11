@@ -25,6 +25,7 @@
     "stockmarket0796_bot": "5047549541:AAHQ631TrO5sEjowkJrOxxgyRfHAcK5SyYA"
   },
   "algorithms": {
-    "all_time_high": 0.05
+    "all_time_high": 0.05,
+    "near_200_ema": 0.02
   }
 }
