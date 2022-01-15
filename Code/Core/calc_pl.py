@@ -15,7 +15,7 @@ class CalculateProfitLoss:
         if ticker_df.head(1)['SIGNAL'].values[0] == 'SELL':
             ticker_df.drop(ticker_df.head(1).index.start, axis=0, inplace=True)
         elif ticker_df.tail(1)['SIGNAL'].values[0] == 'BUY':
-            print("========= Running Profit ==========")
+            # print("========= Running Profit ==========")
             old_ticker_df.tail(1)['SIGNAL'] = 'SELL'
             ticker_df = pd.concat([ticker_df, old_ticker_df.tail(1)], axis=0)
         else:
@@ -31,7 +31,9 @@ class CalculateProfitLoss:
         ticker_df.loc[:, 'BACKTEST_PL'].fillna(0, inplace=True)
         print(f"\nTotal Profit: {ticker_df['BACKTEST_PL'].sum()}")
         print(f"Winning Trades: {len(ticker_df[ticker_df['BACKTEST_PL'] > 0])}")
+        print(f"Winning Profit: {sum(ticker_df[ticker_df['BACKTEST_PL'] > 0]['BACKTEST_PL'])}")
         print(f"Losing Trades: {len(ticker_df[ticker_df['BACKTEST_PL'] < 0])}")
+        print(f"Losing Losses: {sum(ticker_df[ticker_df['BACKTEST_PL'] < 0]['BACKTEST_PL'])}")
         print(f"Max Profit: {max(ticker_df['BACKTEST_PL'])}")
         print(f"Max Loss: {min(ticker_df['BACKTEST_PL'])}")
         return ticker_df

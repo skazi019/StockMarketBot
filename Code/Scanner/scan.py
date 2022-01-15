@@ -151,6 +151,77 @@ class Scanner:
             text = f"Sorry i could not process the request\nError: {e}"
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
+    async def get_21_200_ema_cross_short_term(self,update: Update, context: CallbackContext):
+        try:
+            for p,d,f in os.walk(self.sector_path):
+                for sector in f:
+                    ath_tickers = []
+                    if '.csv' not in sector:
+                        continue
+                    sector_name = sector.split('.')[0].replace('_', ' ')
+                    text = f"Scanning sector: {sector_name}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                    for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='30m', period='1mo')
+                        ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
+                        ticker_df = await EmaCrossover.identify_21_200_crossover(ticker_df=ticker_df)
+                        last_3_days = ticker_df.tail(3)['SIGNAL'].to_list()
+                        if 'BUY' in last_3_days and 'SELL' not in last_3_days:
+                            ath_tickers.append((ticker, ticker_df.iloc[-1]['Close']))
+                        else:
+                            continue
+                        # ath_tickers.append(await AllTimeHigh.close_to_ath_long_term(symbol=ticker))
+                    ath_tickers = list(filter(None, ath_tickers))
+
+                    if len(ath_tickers) <= 0:
+                        text = f"No stocks have 21 and 200 EMA Cross (Short Term) in the past " \
+                               f"3 days for sector: {sector_name}"
+                    else:
+                        text = f"{len(ath_tickers)} stocks identified having 21 and 200 (Short Term) EMA Cross in the past " \
+                               f"3 days in the sector: {sector_name}\n\n"
+                        for ticker in ath_tickers:
+                            text += f"{ticker[0]}: {ticker[1].round(2)}\n"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        except Exception as e:
+            print(f"Error occured: {e}")
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+    async def get_21_200_ema_cross_long_term(self,update: Update, context: CallbackContext):
+        try:
+            for p,d,f in os.walk(self.sector_path):
+                for sector in f:
+                    ath_tickers = []
+                    if '.csv' not in sector:
+                        continue
+                    sector_name = sector.split('.')[0].replace('_', ' ')
+                    text = f"Scanning sector: {sector_name}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                    for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1h', period='6mo')
+                        ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
+                        ticker_df = await EmaCrossover.identify_21_200_crossover(ticker_df=ticker_df)
+                        last_3_days = ticker_df.tail(3)['SIGNAL'].to_list()
+                        if 'BUY' in last_3_days and 'SELL' not in last_3_days:
+                            ath_tickers.append((ticker, ticker_df.iloc[-1]['Close']))
+                        else:
+                            continue
+                        # ath_tickers.append(await AllTimeHigh.close_to_ath_long_term(symbol=ticker))
+                    ath_tickers = list(filter(None, ath_tickers))
+
+                    if len(ath_tickers) <= 0:
+                        text = f"No stocks have 21 and 200 EMA Cross (Long Term) in the past " \
+                               f"3 days for sector: {sector_name}"
+                    else:
+                        text = f"{len(ath_tickers)} stocks identified having 21 and 200 EMA Cross (Long Term) in the past " \
+                               f"3 days in the sector: {sector_name}\n\n"
+                        for ticker in ath_tickers:
+                            text += f"{ticker[0]}: {ticker[1].round(2)}\n"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        except Exception as e:
+            print(f"Error occured: {e}")
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
 if __name__ == '__main__':
@@ -165,12 +236,18 @@ if __name__ == '__main__':
                 text = f"Scanning sector: {sector_name}"
                 for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
                     print(f"Looking up: {ticker}")
-                    ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y'))
+                    ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='30m', period='1mo'))
                     ticker_df = asyncio.run(TechnicalIndicators.calculate_all_emas(ticker_df))
-                    # ticker_df = asyncio.run(EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df))
-                    near_200_ema, ltp = asyncio.run(NearMA.near_200_ema(ticker_df=ticker_df))
-                    if near_200_ema == True:
-                        print(f"***** {ticker} near 200 EMA LTP: {ltp} *****")
+                    ticker_df = asyncio.run(EmaCrossover.identify_21_200_crossover(ticker_df=ticker_df))
+                    ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
+                    last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
+                    if 'BUY' in last_5_days and 'SELL' not in last_5_days:
+                        print(f"***** {ticker} 20-200 EMA cross LTP: {ticker_df.iloc[-1]['Close']} *****")
+                    else:
+                        continue
+                    # near_200_ema = asyncio.run(NearMA.near_200_ema(symbol=ticker, ticker_df=ticker_df))
+                    # if near_200_ema[ticker] == True:
+                    #     print(f"***** {ticker} near 200 EMA LTP: {ticker_df.iloc[-1]['Close']} *****")
                         # ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
                     print("="*60)
         # ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker='ANGELONE', interval='1d', period='1y'))
