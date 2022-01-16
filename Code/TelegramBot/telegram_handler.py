@@ -25,7 +25,7 @@ dispatcher.add_handler(menu_handler)
 dispatcher.add_handler(CallbackQueryHandler(TelegramCommands.menuclick))
 dispatcher.add_handler(unknown_handler)
 
-updater.start_polling()
+# updater.start_polling()
 updater.start_webhook(listen="0.0.0.0", port=int(PORT), url_path=TOKEN)
 updater.bot.setWebhook('https://stockmarketbot-0796.herokuapp.com/' + TOKEN)
 updater.idle()
