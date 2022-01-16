@@ -1,6 +1,7 @@
 
 import sys
 sys.path.append('../../../StockMarketBot')
+TOKEN = ConfigUtil.get_config('telegram')['stockmarket0796_bot']
 
 import logging
 
@@ -11,7 +12,7 @@ from Code.TelegramBot.telegram_commands import TelegramCommands
 
 logging.basicConfig(format='%(asctime)s | %(name)s | %(levelname)s | %(message)s', level=logging.INFO)
 
-updater = Updater(token=ConfigUtil.get_config('telegram')['stockmarket0796_bot'])
+updater = Updater(token=TOKEN)
 
 dispatcher = updater.dispatcher
 
@@ -25,3 +26,6 @@ dispatcher.add_handler(CallbackQueryHandler(TelegramCommands.menuclick))
 dispatcher.add_handler(unknown_handler)
 
 updater.start_polling()
+updater.start_webhook(listen="0.0.0.0", port=int(PORT), url_path=TOKEN)
+updater.bot.setWebhook('https://stockmarketbot-0796.herokuapp.com/' + TOKEN)
+updater.idle()
