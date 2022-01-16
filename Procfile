@@ -1,0 +1,1 @@
+web: python3 ./Code/TelegramBot/telegram_handler.py
