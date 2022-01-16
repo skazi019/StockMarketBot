@@ -23,10 +23,10 @@ class TelegramCommands:
         services_available = [
             InlineKeyboardButton(text="All Time High (Short Term)", callback_data="ath_short"),
             InlineKeyboardButton(text="All Time High (Long Term)", callback_data="ath_long"),
-            InlineKeyboardButton(text="9 21 EMA Cross", callback_data="9_21_ema_cross"),
-            InlineKeyboardButton(text="21 90 EMA Cross", callback_data="21_90_ema_cross"),
-            InlineKeyboardButton(text="21 200 EMA Cross\n(Short Term)", callback_data="21_200_ema_cross_st"),
-            InlineKeyboardButton(text="21 200 EMA Cross\n(Long Term)", callback_data="21_200_ema_cross_lt"),
+            InlineKeyboardButton(text="9-21 EMA Cross", callback_data="9_21_ema_cross"),
+            InlineKeyboardButton(text="21-90 EMA Cross", callback_data="21_90_ema_cross"),
+            InlineKeyboardButton(text="21-200 EMA Cross\n(Short Term)", callback_data="21_200_ema_cross_st"),
+            InlineKeyboardButton(text="21-200 EMA Cross\n(Long Term)", callback_data="21_200_ema_cross_lt"),
         ]
         reply_markup = InlineKeyboardMarkup(util.build_menu(services_available, n_cols=2))
         context.bot.send_message(chat_id=update.message.chat_id, text="Below are the live services",
@@ -71,7 +71,7 @@ class TelegramCommands:
 
             elif service == '9_21_ema_cross':
                 text = "Finding stocks with 9 and 21 EMA Crossing\n\n"
-                text += "interval: 1 Hour\nperiod: 6 Months\n\nThis might take some time"
+                text += "interval: 1 Hour\nperiod: 1 Month\n\nThis might take some time"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
@@ -85,7 +85,7 @@ class TelegramCommands:
 
             elif service == '21_90_ema_cross':
                 text = "Finding stocks with 21 and 90 EMA Crossing\n\n"
-                text += "interval: 1 Day\nperiod: 1 Year\nThis might take some time"
+                text += "interval: 1 Day\nperiod: 1 Month\nThis might take some time"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
@@ -99,7 +99,7 @@ class TelegramCommands:
 
             elif service == '21_200_ema_cross_st':
                 text = "Finding stocks with 21 and 200 EMA Crossing for Short Term\n\n"
-                text += "interval: 30 minutes\nperiod: 1 month\n\nThis might take some time"
+                text += "interval: 30 minutes\nperiod: 1 Month\n\nThis might take some time"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
@@ -113,7 +113,7 @@ class TelegramCommands:
 
             elif service == '21_200_ema_cross_lt':
                 text = "Finding stocks with 21 and 200 EMA Crossing for Long Term\n\n"
-                text += "interval: 1 hour\nperiod: 6 months\n\nThis might take some time"
+                text += "interval: 1 hour\nperiod: 1 Month\n\nThis might take some time"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:

@@ -90,10 +90,11 @@ class Scanner:
                     text = "="*5 + f" Scanning sector: {sector_name} " + "="*5
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                     for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
-                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1h', period='6mo')
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1h', period='1mo')
                         ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
                         ticker_df = await EmaCrossover.identify_9_21_crossover(ticker_df=ticker_df)
-                        last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
+                        hours_per_day = 7
+                        last_5_days = ticker_df.tail(5*hours_per_day)['SIGNAL'].to_list()
                         if 'BUY' in last_5_days and 'SELL' not in last_5_days:
                             ath_tickers.append(ticker)
                         else:
@@ -126,7 +127,7 @@ class Scanner:
                     text = f"Scanning sector: {sector_name}"
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                     for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
-                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1y')
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1mo')
                         ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
                         ticker_df = await EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df)
                         last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
@@ -165,7 +166,8 @@ class Scanner:
                         ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='30m', period='1mo')
                         ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
                         ticker_df = await EmaCrossover.identify_21_200_crossover(ticker_df=ticker_df)
-                        last_3_days = ticker_df.tail(3)['SIGNAL'].to_list()
+                        minutes_per_day = 13
+                        last_3_days = ticker_df.tail(3*minutes_per_day)['SIGNAL'].to_list()
                         if 'BUY' in last_3_days and 'SELL' not in last_3_days:
                             ath_tickers.append((ticker, ticker_df.iloc[-1]['Close']))
                         else:
@@ -201,7 +203,8 @@ class Scanner:
                         ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1h', period='6mo')
                         ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
                         ticker_df = await EmaCrossover.identify_21_200_crossover(ticker_df=ticker_df)
-                        last_3_days = ticker_df.tail(3)['SIGNAL'].to_list()
+                        hours_per_day = 7
+                        last_3_days = ticker_df.tail(3*hours_per_day)['SIGNAL'].to_list()
                         if 'BUY' in last_3_days and 'SELL' not in last_3_days:
                             ath_tickers.append((ticker, ticker_df.iloc[-1]['Close']))
                         else:
@@ -236,12 +239,14 @@ if __name__ == '__main__':
                 text = f"Scanning sector: {sector_name}"
                 for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
                     print(f"Looking up: {ticker}")
-                    ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='30m', period='1mo'))
+                    ticker_df = asyncio.run(FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1mo'))
                     ticker_df = asyncio.run(TechnicalIndicators.calculate_all_emas(ticker_df))
                     ticker_df = asyncio.run(EmaCrossover.identify_21_200_crossover(ticker_df=ticker_df))
-                    ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
-                    last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
-                    if 'BUY' in last_5_days and 'SELL' not in last_5_days:
+                    # ticker_df = CalculateProfitLoss.calculate_pl(ticker_df=ticker_df)
+                    minutes_per_day = 13
+                    hours_per_day = 7
+                    last_5_days = ticker_df.tail(3)['SIGNAL'].to_list()
+                    if 'BUY' in last_5_days:
                         print(f"***** {ticker} 20-200 EMA cross LTP: {ticker_df.iloc[-1]['Close']} *****")
                     else:
                         continue
