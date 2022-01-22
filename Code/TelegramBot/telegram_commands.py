@@ -24,7 +24,9 @@ class TelegramCommands:
             InlineKeyboardButton(text="All Time High (Short Term)", callback_data="ath_short"),
             InlineKeyboardButton(text="All Time High (Long Term)", callback_data="ath_long"),
             InlineKeyboardButton(text="9-21 EMA Cross", callback_data="9_21_ema_cross"),
-            InlineKeyboardButton(text="21-90 EMA Cross", callback_data="21_90_ema_cross"),
+            InlineKeyboardButton(text="21-90 EMA Cross (30 Mins)", callback_data="21_90_ema_cross_30mins"),
+            InlineKeyboardButton(text="21-90 EMA Cross (1 Hour)", callback_data="21_90_ema_cross_1hour"),
+            InlineKeyboardButton(text="21-90 EMA Cross (1 Day)", callback_data="21_90_ema_cross_1day"),
             InlineKeyboardButton(text="21-200 EMA Cross\n(Short Term)", callback_data="21_200_ema_cross_st"),
             InlineKeyboardButton(text="21-200 EMA Cross\n(Long Term)", callback_data="21_200_ema_cross_lt"),
         ]
@@ -49,7 +51,7 @@ class TelegramCommands:
                 try:
                     context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
                     asyncio.run(telegram_services.ath_short(update, context))
-                    text = f"Scanning Complete"
+                    text = "="*10 + "Scanning Complete" + "="*10
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
                     text = f"Sorry i could not process the request\nError: {e}"
@@ -63,7 +65,7 @@ class TelegramCommands:
                 try:
                     context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
                     asyncio.run(telegram_services.ath_long(update, context))
-                    text = f"Scanning Complete"
+                    text = "="*10 + "Scanning Complete" + "="*10
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
                     text = f"Sorry i could not process the request\nError: {e}"
@@ -77,21 +79,49 @@ class TelegramCommands:
                 try:
                     context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
                     asyncio.run(telegram_services.ema_cross_9_21(update, context))
-                    text = f"Scanning Complete"
+                    text = "="*10 + "Scanning Complete" + "="*10
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
                     text = f"Sorry i could not process the request\nError: {e}"
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
-            elif service == '21_90_ema_cross':
+            elif service == '21_90_ema_cross_30min':
+                text = "Finding stocks with 21 and 90 EMA Crossing\n\n"
+                text += "interval: 30 Mins \nperiod: 1 Month\n\nThis might take some time"
+                context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+                try:
+                    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+                    asyncio.run(telegram_services.ema_cross_21_90_30m(update, context))
+                    text = "="*10 + "Scanning Complete" + "="*10
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                except Exception as e:
+                    text = f"Sorry i could not process the request\nError: {e}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+            elif service == '21_90_ema_cross_1hour':
+                text = "Finding stocks with 21 and 90 EMA Crossing\n\n"
+                text += "interval: 1 Hour \nperiod: 1 Month\n\nThis might take some time"
+                context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+                try:
+                    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+                    asyncio.run(telegram_services.ema_cross_21_90_1h(update, context))
+                    text = "="*10 + "Scanning Complete" + "="*10
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                except Exception as e:
+                    text = f"Sorry i could not process the request\nError: {e}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+            elif service == '21_90_ema_cross_1day':
                 text = "Finding stocks with 21 and 90 EMA Crossing\n\n"
                 text += "interval: 1 Day\nperiod: 1 Month\nThis might take some time"
                 context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
                 try:
                     context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
-                    asyncio.run(telegram_services.ema_cross_21_90(update, context))
-                    text = f"Scanning Complete"
+                    asyncio.run(telegram_services.ema_cross_21_90_1d(update, context))
+                    text = "="*10 + "Scanning Complete" + "="*10
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
                     text = f"Sorry i could not process the request\nError: {e}"
@@ -105,7 +135,7 @@ class TelegramCommands:
                 try:
                     context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
                     asyncio.run(telegram_services.ema_cross_21_200_short_term(update, context))
-                    text = f"Scanning Complete"
+                    text = "="*10 + "Scanning Complete" + "="*10
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
                     text = f"Sorry i could not process the request\nError: {e}"
@@ -119,7 +149,7 @@ class TelegramCommands:
                 try:
                     context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
                     asyncio.run(telegram_services.ema_cross_21_200_long_term(update, context))
-                    text = f"Scanning Complete"
+                    text = "="*10 + "Scanning Complete" + "="*10
                     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
                 except Exception as e:
                     text = f"Sorry i could not process the request\nError: {e}"
