@@ -116,7 +116,79 @@ class Scanner:
             text = f"Sorry i could not process the request\nError: {e}"
             context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
-    async def get_21_90_ema_cross(self,update: Update, context: CallbackContext):
+    async def get_21_90_ema_cross_30m(self,update: Update, context: CallbackContext):
+        try:
+            for p,d,f in os.walk(self.sector_path):
+                for sector in f:
+                    ath_tickers = []
+                    if '.csv' not in sector:
+                        continue
+                    sector_name = sector.split('.')[0].replace('_', ' ')
+                    text = f"Scanning sector: {sector_name}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                    for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='30m', period='1mo')
+                        ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
+                        ticker_df = await EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df)
+                        last_5_days = ticker_df.tail(3)['SIGNAL'].to_list()
+                        if 'BUY' in last_5_days and 'SELL' not in last_5_days:
+                            ath_tickers.append(ticker)
+                        else:
+                            continue
+                        # ath_tickers.append(await AllTimeHigh.close_to_ath_long_term(symbol=ticker))
+                    ath_tickers = list(filter(None, ath_tickers))
+
+                    if len(ath_tickers) <= 0:
+                        text = f"No stocks have 21 and 90 EMA Cross in the past " \
+                               f"3 days for sector: {sector_name}"
+                    else:
+                        text = f"{len(ath_tickers)} stocks identified having 21 and 90 EMA Cross in the past " \
+                               f"3 days in the sector: {sector_name}\n\n"
+                        for ticker in ath_tickers:
+                            text += str(ticker)+"\n"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        except Exception as e:
+            print(f"Error occured: {e}")
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+    async def get_21_90_ema_cross_1h(self,update: Update, context: CallbackContext):
+        try:
+            for p,d,f in os.walk(self.sector_path):
+                for sector in f:
+                    ath_tickers = []
+                    if '.csv' not in sector:
+                        continue
+                    sector_name = sector.split('.')[0].replace('_', ' ')
+                    text = f"Scanning sector: {sector_name}"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+                    for ticker in pd.read_csv(os.path.join(p, sector))['Symbol'].to_list():
+                        ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1h', period='1mo')
+                        ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
+                        ticker_df = await EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df)
+                        last_5_days = ticker_df.tail(3)['SIGNAL'].to_list()
+                        if 'BUY' in last_5_days and 'SELL' not in last_5_days:
+                            ath_tickers.append(ticker)
+                        else:
+                            continue
+                        # ath_tickers.append(await AllTimeHigh.close_to_ath_long_term(symbol=ticker))
+                    ath_tickers = list(filter(None, ath_tickers))
+
+                    if len(ath_tickers) <= 0:
+                        text = f"No stocks have 21 and 90 EMA Cross in the past " \
+                               f"3 days for sector: {sector_name}"
+                    else:
+                        text = f"{len(ath_tickers)} stocks identified having 21 and 90 EMA Cross in the past " \
+                               f"3 days in the sector: {sector_name}\n\n"
+                        for ticker in ath_tickers:
+                            text += str(ticker)+"\n"
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        except Exception as e:
+            print(f"Error occured: {e}")
+            text = f"Sorry i could not process the request\nError: {e}"
+            context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
+    async def get_21_90_ema_cross_1d(self,update: Update, context: CallbackContext):
         try:
             for p,d,f in os.walk(self.sector_path):
                 for sector in f:
@@ -130,7 +202,7 @@ class Scanner:
                         ticker_df = await FetchData.fetch_yahoo_fin_data(ticker=ticker, interval='1d', period='1mo')
                         ticker_df = await TechnicalIndicators.calculate_all_emas(ticker_df)
                         ticker_df = await EmaCrossover.identify_21_90_crossover(ticker_df=ticker_df)
-                        last_5_days = ticker_df.tail(5)['SIGNAL'].to_list()
+                        last_5_days = ticker_df.tail(3)['SIGNAL'].to_list()
                         if 'BUY' in last_5_days and 'SELL' not in last_5_days:
                             ath_tickers.append(ticker)
                         else:
