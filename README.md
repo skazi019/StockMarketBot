@@ -14,3 +14,6 @@ is a potential candidate to be bought for short term or long term.
  - Telegram service
  - Technical Indicators in stock market
  - Strategies based on Technical indicators for stock market 
+
+### Demonstration
+![Bot Demo](StockMarketBot.gif)
