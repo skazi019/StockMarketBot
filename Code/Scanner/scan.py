@@ -23,7 +23,7 @@ class Scanner:
 
     def __init__(self):
         self.sector_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tickers')
-        self.all_sector_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'all_sectors')
+        # self.all_sector_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'all_sectors')
 
     async def get_all_time_high_st(self,update: Update, context: CallbackContext):
         try:
@@ -81,7 +81,7 @@ class Scanner:
 
     async def get_9_21_ema_cross(self,update: Update, context: CallbackContext):
         try:
-            for p,d,f in os.walk(self.all_sector_path):
+            for p,d,f in os.walk(self.sector_path):
                 for sector in f:
                     ath_tickers = []
                     if '.csv' not in sector:

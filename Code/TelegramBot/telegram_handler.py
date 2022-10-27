@@ -1,6 +1,9 @@
 
+from os.path import dirname
 import sys
-sys.path.append('../../../StockMarketBot')
+import os
+
+sys.path.append(dirname(dirname(dirname(os.path.abspath(__file__)))))
 
 import logging
 
